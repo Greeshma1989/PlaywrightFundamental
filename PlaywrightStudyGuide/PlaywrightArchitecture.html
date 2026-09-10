@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playwright Architecture — A QA Engineer's Deep Dive</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0D1B2A;
+    --navy-mid:#1E3A5F;
+    --teal:    #00C9A7;
+    --teal-dim:#00a589;
+    --amber:   #F59E0B;
+    --red-soft:#FF6B6B;
+    --white:   #F8FAFC;
+    --muted:   #94A3B8;
+    --panel:   #162032;
+    --border:  #1E3A5F;
+    --code-bg: #0a1520;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0D1B2A 0%, #0a2540 50%, #0D1B2A 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 80px 24px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(0,201,167,0.12), transparent);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(0,201,167,0.15);
+    border: 1px solid rgba(0,201,167,0.4);
+    color: var(--teal);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.15;
+    max-width: 820px;
+    margin: 0 auto 20px;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero-sub {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 560px;
+    margin: 0 auto 36px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+  /* ── LAYOUT ── */
+  .wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 64px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    color: var(--white);
+  }
+
+  h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--white);
+    margin: 28px 0 10px;
+  }
+
+  p { color: #CBD5E1; margin-bottom: 16px; max-width: 72ch; }
+
+  /* ── ARCHITECTURE DIAGRAM ── */
+  .arch-diagram {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 24px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .arch-diagram::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  }
+  .arch-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .arch-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+  }
+  .arch-layer {
+    width: 100%;
+    max-width: 680px;
+    border-radius: 10px;
+    padding: 16px 24px;
+    text-align: center;
+    position: relative;
+  }
+  .layer-test {
+    background: rgba(0,201,167,0.18);
+    border: 1.5px solid var(--teal);
+  }
+  .layer-api {
+    background: rgba(59,130,246,0.15);
+    border: 1.5px solid #3B82F6;
+    margin: 0 auto;
+    width: calc(100% - 60px);
+    max-width: 580px;
+  }
+  .layer-protocol {
+    background: rgba(139,92,246,0.15);
+    border: 1.5px solid #8B5CF6;
+    width: calc(100% - 120px);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .layer-browser {
+    background: rgba(245,158,11,0.12);
+    border: 1.5px solid var(--amber);
+    width: calc(100% - 180px);
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .arch-arrow {
+    text-align: center;
+    color: var(--muted);
+    font-size: 1.2rem;
+    padding: 6px 0;
+    line-height: 1;
+  }
+  .layer-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  .layer-test .layer-name  { color: var(--teal); }
+  .layer-api .layer-name   { color: #60A5FA; }
+  .layer-protocol .layer-name { color: #A78BFA; }
+  .layer-browser .layer-name  { color: var(--amber); }
+  .layer-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .browsers-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .browser-chip {
+    background: rgba(245,158,11,0.15);
+    border: 1px solid rgba(245,158,11,0.4);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--amber);
+  }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 24px 0;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #E2E8F0;
+  }
+  .code-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--teal);
+    background: rgba(0,201,167,0.1);
+    padding: 3px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .c-comment { color: #4A6FA5; }
+  .c-keyword  { color: #C792EA; }
+  .c-string   { color: #C3E88D; }
+  .c-func     { color: #82AAFF; }
+  .c-teal     { color: var(--teal); }
+
+  /* ── STEPS ── */
+  .steps-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 32px 0;
+    position: relative;
+  }
+  .steps-grid::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--teal), transparent);
+  }
+  .step-item {
+    display: flex;
+    gap: 24px;
+    padding: 24px 0;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(0,201,167,0.12);
+    border: 1.5px solid var(--teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--teal);
+    position: relative;
+    z-index: 1;
+  }
+  .step-content h3 { margin-top: 4px; margin-bottom: 6px; }
+  .step-content p { margin-bottom: 0; }
+
+  /* ── PROS / CONS ── */
+  .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 32px 0;
+  }
+  @media (max-width: 600px) { .pros-cons { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .card-pros { border-top: 3px solid var(--teal); }
+  .card-cons { border-top: 3px solid var(--red-soft); }
+  .card-head {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-pros .card-head { color: var(--teal); }
+  .card-cons .card-head { color: var(--red-soft); }
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: #CBD5E1;
+    line-height: 1.5;
+  }
+  .check-list li .icon { flex-shrink: 0; font-size: 0.9rem; margin-top: 2px; }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0;
+    font-size: 0.87rem;
+  }
+  .compare-table th {
+    background: var(--navy-mid);
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-bottom: 2px solid var(--teal);
+  }
+  .compare-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    color: #CBD5E1;
+    vertical-align: top;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .compare-table .th-playwright { color: var(--teal); }
+  .compare-table .th-selenium  { color: var(--amber); }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-teal  { background: rgba(0,201,167,0.15); color: var(--teal); }
+  .badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .badge-red   { background: rgba(255,107,107,0.15); color: var(--red-soft); }
+
+  /* ── KEY TAKEAWAYS ── */
+  .takeaways {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .takeaway {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .takeaway-icon { font-size: 1.5rem; margin-bottom: 12px; }
+  .takeaway h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .takeaway p { font-size: 0.82rem; margin: 0; }
+
+  /* ── QUOTE ── */
+  .pull-quote {
+    border-left: 3px solid var(--teal);
+    padding: 20px 28px;
+    margin: 40px 0;
+    background: rgba(0,201,167,0.06);
+    border-radius: 0 10px 10px 0;
+  }
+  .pull-quote p {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--white);
+    font-style: italic;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 48px 24px;
+    text-align: center;
+  }
+  .footer-author {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .footer-role { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+  .footer-tags {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .tag {
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.3);
+    color: var(--teal);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .divider { width: 48px; height: 2px; background: var(--teal); margin: 0 auto 24px; border-radius: 2px; }
+
+  @media print {
+    body { background: white; color: #111; }
+    .hero { background: #f0f0f0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">QA Engineering · Test Automation</div>
+  <h1>Understanding <span>Playwright Architecture</span><br>A Complete Guide for QA Engineers</h1>
+  <p class="hero-sub">From WebSocket protocols to browser contexts — everything you need to know about how Playwright works under the hood, and why it matters for your automation career.</p>
+  <div class="hero-meta">
+    <span>⚡ By Greeshma</span>
+    <span>📖 15 min read</span>
+    <span>🎯 QA Engineers</span>
+  </div>
+</div>
+
+<!-- WHAT IS PLAYWRIGHT -->
+<section>
+  <div class="wrapper">
+    <div class="section-label">// 01 — Foundation</div>
+    <h2>What Is Playwright, and Why Should QA Engineers Care?</h2>
+    <p>Playwright is an open-source test automation framework built by Microsoft, released in 2020. It allows you to write automated tests for web applications across Chromium, Firefox, and WebKit — using a single, unified API.</p>
+    <p>But here's what makes Playwright different from tools you may have used before: <strong style="color:var(--white)">it doesn't control browsers from the outside.</strong> It communicates directly with the browser at the protocol level — which means it's faster, more reliable, and aware of things happening inside the page in real time.</p>
+
+    <div class="pull-quote">
+      <p>"Playwright doesn't knock on the browser's door and wait. It's already inside the room."</p>
+    </div>
+
+    <p>As a QA engineer, you don't need to understand every internal detail — but knowing <em>why</em> Playwright behaves the way it does will help you write better tests, debug failures faster, and explain your architecture choices confidently.</p>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section>
+  <div class="wrapper">
+    <div class="section-label">// 02 — Architecture</div>
+    <h2>Playwright's Architecture — Layer by Layer</h2>
+    <p>Playwright is built in a layered architecture. Each layer has a specific responsibility, and they communicate with each other in a well-defined way.</p>
+
+    <div class="arch-diagram">
+      <div class="arch-title">Playwright Architecture Stack</div>
+      <div class="arch-layers">
+
+        <div class="arch-layer layer-test">
+          <div class="layer-name">Your Test Code</div>
+          <div class="layer-desc">test('login works', async ({ page }) => { ... })</div>
+        </div>
+
+        <div class="arch-arrow">↕ calls</div>
+
+        <div class="arch-layer layer-api">
+          <div class="layer-name">Playwright Node.js / Python / Java API</div>
+          <div class="layer-desc">page.goto() · page.click() · expect(locator).toBeVisible()</div>
+        </div>
+
+        <div class="arch-arrow">↕ WebSocket (JSON messages)</div>
+
+        <div class="arch-layer layer-protocol">
+          <div class="layer-name">Browser Server Process</div>
+          <div class="layer-desc">CDP (Chromium) · Firefox Protocol · WebKit Protocol</div>
+        </div>
+
+        <div class="arch-arrow">↕ spawns &amp; controls</div>
+
+        <div class="arch-layer layer-browser">
+          <div class="layer-name">Browser Engines</div>
+          <div class="layer-desc">Bundled browser binaries — not your installed browser</div>
+        </div>
+
+        <div class="browsers-row">
+          <div class="browser-chip">🟠 Chromium</div>
+          <div class="browser-chip">🦊 Firefox</div>
+          <div class="browser-chip">🧭 WebKit (Safari)</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Layer 1: Your Test Code</h3>
+    <p>This is what you write — test files using Playwright's API. You write human-readable test steps. Playwright translates those into browser instructions behind the scenes.</p>
+
+    <h3>Layer 2: The Playwright API</h3>
+    <p>Available in TypeScript/JavaScript, Python, Java, and .NET. This API is your contract with Playwright. Methods like <code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:0.9em">page.click()</code>, <code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:0.9em">page.fill()</code>, and <code style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:0.9em">locator.waitFor()</code> are defined here.</p>
+
+    <h3>Layer 3: Browser Server / Protocol Bridge</h3>
+    <p>This is Playwright's secret weapon. It uses a persistent WebSocket connection to send JSON commands directly to the browser's internal debugging protocol — CDP for Chromium, custom protocols for Firefox and WebKit. This connection stays open for the entire test session, making it fast and stateful.</p>
+
+    <h3>Layer 4: Bundled Browser Binaries</h3>
+    <p>Playwright ships with its own browser binaries, separate from whatever Chrome or Firefox you have installed. This ensures version consistency — no "it works on my machine" failures due to browser version mismatches.</p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS STEP BY STEP -->
+<section>
+  <div class="wrapper">
+    <div class="section-label">// 03 — Execution Flow</div>
+    <h2>How a Playwright Test Executes — Step by Step</h2>
+    <p>Let's trace what happens when you run a single test:</p>
+
+    <div class="steps-grid">
+
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Test Runner Starts</h3>
+          <p>You run <code style="color:var(--teal);font-family:'JetBrains Mono',monospace">npx playwright test</code>. The Playwright Test runner discovers your test files, sets up workers, and begins execution. Each worker is an isolated Node.js process.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>Browser Launch</h3>
+          <p>Playwright spawns a browser process from its bundled binaries. The browser starts in headed or headless mode based on your config. A WebSocket server opens inside the browser.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Browser Context Created</h3>
+          <p>A Browser Context is created — think of it as a fresh, isolated browser profile. It has its own cookies, localStorage, and session state. This is how Playwright achieves true test isolation without restarting the browser.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h3>Page Object Created</h3>
+          <p>A new page (browser tab) is opened inside the context. This is the <code style="color:var(--teal);font-family:'JetBrains Mono',monospace">page</code> object in your test. All your interactions happen through this object.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <h3>Commands Sent via WebSocket</h3>
+          <p>When you call <code style="color:var(--teal);font-family:'JetBrains Mono',monospace">page.goto('https://example.com')</code>, Playwright sends a JSON message over the WebSocket to the browser's protocol. The browser acts on it and sends back a confirmation with any result data.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">06</div>
+        <div class="step-content">
+          <h3>Auto-Waiting Kicks In</h3>
+          <p>Before every action, Playwright checks that the element is: visible, stable (not animating), enabled, and editable (for inputs). This is called <strong style="color:var(--white)">actionability checking</strong> — and it eliminates most flakiness automatically.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">07</div>
+        <div class="step-content">
+          <h3>Assertions Evaluate</h3>
+          <p>Playwright's web-first assertions (via <code style="color:var(--teal);font-family:'JetBrains Mono',monospace">expect()</code>) automatically retry until the expected condition is true or the timeout is reached. No manual <code style="color:var(--teal);font-family:'JetBrains Mono',monospace">waitForSelector</code> needed.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">08</div>
+        <div class="step-content">
+          <h3>Cleanup and Teardown</h3>
+          <p>After the test, the context is closed (clearing all state), and the browser process is either reused for the next test or shut down. Artifacts like screenshots, videos, and traces are saved if configured.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CODE EXAMPLES -->
+<section>
+  <div class="wrapper">
+    <div class="section-label">// 04 — Real Code</div>
+    <h2>Playwright in Action — QA-Focused Examples</h2>
+
+    <h3>Example 1: Basic Login Test</h3>
+    <div class="code-block">
+      <div class="code-label">login.spec.ts</div>
+<span class="c-keyword">import</span> { test, expect } <span class="c-keyword">from</span> <span class="c-string">'@playwright/test'</span>;
+
+test<span class="c-teal">(</span><span class="c-string">'user can log in successfully'</span>, <span class="c-keyword">async</span> ({ page }) => {
+
+  <span class="c-comment">// Step 1: Navigate to the login page</span>
+  <span class="c-keyword">await</span> page.<span class="c-func">goto</span>(<span class="c-string">'https://myapp.com/login'</span>);
+
+  <span class="c-comment">// Step 2: Fill form fields — Playwright waits for elements automatically</span>
+  <span class="c-keyword">await</span> page.<span class="c-func">fill</span>(<span class="c-string">'[data-testid="email"]'</span>, <span class="c-string">'qa@example.com'</span>);
+  <span class="c-keyword">await</span> page.<span class="c-func">fill</span>(<span class="c-string">'[data-testid="password"]'</span>, <span class="c-string">'securePass123'</span>);
+
+  <span class="c-comment">// Step 3: Click the button</span>
+  <span class="c-keyword">await</span> page.<span class="c-func">click</span>(<span class="c-string">'button[type="submit"]'</span>);
+
+  <span class="c-comment">// Step 4: Assert the dashboard is visible — retries automatically</span>
+  <span class="c-keyword">await</span> <span class="c-func">expect</span>(page.<span class="c-func">locator</span>(<span class="c-string">'h1'</span>)).<span class="c-func">toHaveText</span>(<span class="c-string">'Welcome back!'</span>);
+
+<span class="c-teal">}</span>);
+    </div>
+
+    <h3>Example 2: Isolated Contexts for Parallel Tests</h3>
+    <div class="code-block">
+      <div class="code-label">parallel-contexts.spec.ts</div>
+<span class="c-comment">// Two users logged in simultaneously — no cookie conflicts!</span>
+test<span class="c-teal">(</span><span class="c-string">'admin and regular user can work simultaneously'</span>, <span class="c-keyword">async</span> ({ browser }) => {
+
+  <span class="c-comment">// Each context = isolated browser session</span>
+  <span class="c-keyword">const</span> adminContext = <span class="c-keyword">await</span> browser.<span class="c-func">newContext</span>({
+    storageState: <span class="c-string">'./auth/admin.json'</span>
+  });
+
+  <span class="c-keyword">const</span> userContext = <span class="c-keyword">await</span> browser.<span class="c-func">newContext</span>({
+    storageState: <span class="c-string">'./auth/user.json'</span>
+  });
+
+  <span class="c-keyword">const</span> adminPage = <span class="c-keyword">await</span> adminContext.<span class="c-func">newPage</span>();
+  <span class="c-keyword">const</span> userPage  = <span class="c-keyword">await</span> userContext.<span class="c-func">newPage</span>();
+
+  <span class="c-keyword">await</span> adminPage.<span class="c-func">goto</span>(<span class="c-string">'/admin/dashboard'</span>);
+  <span class="c-keyword">await</span> userPage.<span class="c-func">goto</span>(<span class="c-string">'/dashboard'</span>);
+
+  <span class="c-comment">// Clean up</span>
+  <span class="c-keyword">await</span> adminContext.<span class="c-func">close</span>();
+  <span class="c-keyword">await</span> userContext.<span class="c-func">close</span>();
+<span class="c-teal">}</span>);
+    </div>
+
+    <h3>Example 3: API + UI Combined Test</h3>
+    <div class="code-block">
+      <div class="code-label">api-ui.spec.ts</div>
+<span class="c-comment">// Use Playwright's request context to call APIs AND test the UI</span>
+test<span class="c-teal">(</span><span class="c-string">'order created via API shows in UI'</span>, <span class="c-keyword">async</span> ({ page, request }) => {
+
+  <span class="c-comment">// Create order via API (faster than UI flow)</span>
+  <span class="c-keyword">const</span> response = <span class="c-keyword">await</span> request.<span class="c-func">post</span>(<span class="c-string">'/api/orders'</span>, {
+    data: { productId: <span class="c-string">'ABC123'</span>, qty: 2 }
+  });
+  <span class="c-keyword">const</span> { orderId } = <span class="c-keyword">await</span> response.<span class="c-func">json</span>();
+
+  <span class="c-comment">// Verify the UI shows this order</span>
+  <span class="c-keyword">await</span> page.<span class="c-func">goto</span>(<span class="c-string">`/orders/${orderId}`</span>);
+  <span class="c-keyword">await</span> <span class="c-func">expect</span>(page.<span class="c-func">locator</span>(<span class="c-string">'.order-status'</span>)).<span class="c-func">toContainText</span>(<span class="c-string">'Confirmed'</span>);
+<span class="c-teal">}</span>);
+    </div>
+  </div>
+</section>
+
+<!-- PROS AND CONS -->
+<section>
+  <div class="wrapper">
+    <div class="section-label">// 05 — Pros & Cons</div>
+    <h2>Playwright: Honest Pros and Cons</h2>
+
+    <div class="pros-cons">
+      <div class="card card-pros">
+        <div class="card-head">✅ Strengths</div>
+        <ul class="check-list">
+          <li><span class="icon">⚡</span><span><strong>Auto-waiting built in</strong> — no more Thread.sleep() or flaky explicit waits. Playwright waits for actionability before every interaction.</span></li>
+          <li><span class="icon">🌐</span><span><strong>True cross-browser</strong> — Chromium, Firefox, and WebKit from one API and one codebase.</span></li>
+          <li><span class="icon">🔒</span><span><strong>Isolated browser contexts</strong> — parallel tests don't share cookies or state. Real isolation, not workarounds.</span></li>
+          <li><span class="icon">📸</span><span><strong>Rich debugging tools</strong> — Trace Viewer, screenshot-on-failure, video recording, and <code style="font-family:'JetBrains Mono',monospace;color:var(--teal)">--ui</code> mode out of the box.</span></li>
+          <li><span class="icon">🔗</span><span><strong>API testing built in</strong> — <code style="font-family:'JetBrains Mono',monospace;color:var(--teal)">request</code> fixture lets you test REST APIs alongside UI in the same test.</span></li>
+          <li><span class="icon">🛡️</span><span><strong>Network interception</strong> — mock APIs, block ads, simulate slow networks without extra tools.</span></li>
+          <li><span class="icon">🚀</span><span><strong>Fast by default</strong> — WebSocket protocol is far faster than HTTP-round-trip tools like Selenium WebDriver.</span></li>
+          <li><span class="icon">🎭</span><span><strong>Multi-language support</strong> — TypeScript, Python, Java, .NET. Use what your team already knows.</span></li>
+        </ul>
+      </div>
+
+      <div class="card card-cons">
+        <div class="card-head">⚠️ Limitations</div>
+        <ul class="check-list">
+          <li><span class="icon">📈</span><span><strong>Learning curve</strong> — concepts like Browser, Context, and Page hierarchy can be confusing at first for manual QA engineers.</span></li>
+          <li><span class="icon">🔮</span><span><strong>Relatively newer ecosystem</strong> — fewer Stack Overflow answers and community plugins compared to Selenium's decade-long head start.</span></li>
+          <li><span class="icon">🌐</span><span><strong>No IE support</strong> — if your project needs Internet Explorer, Playwright cannot help you (but arguably neither should you).</span></li>
+          <li><span class="icon">⚙️</span><span><strong>Node.js dependency (JS/TS)</strong> — requires Node.js setup and npm understanding for JavaScript users, which some QA teams find intimidating.</span></li>
+          <li><span class="icon">💾</span><span><strong>Bundled browser size</strong> — Playwright downloads its own browser binaries (~200MB+), which can slow CI/CD pipeline setup time initially.</span></li>
+          <li><span class="icon">📱</span><span><strong>Mobile testing is emulation</strong> — Playwright emulates mobile viewports but cannot test real native iOS or Android apps.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section>
+  <div class="wrapper">
+    <div class="section-label">// 06 — Comparison</div>
+    <h2>Playwright vs Selenium — A Practical Comparison</h2>
+    <p>Both are excellent tools with different philosophies. Here's an honest, side-by-side breakdown of what matters for QA engineers:</p>
+
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th class="th-playwright">⚡ Playwright</th>
+            <th class="th-selenium">🔸 Selenium</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Protocol</strong></td>
+            <td>WebSocket (CDP / custom) — persistent connection</td>
+            <td>HTTP WebDriver protocol — request per command</td>
+          </tr>
+          <tr>
+            <td><strong>Speed</strong></td>
+            <td><span class="badge badge-teal">Faster</span> — direct protocol, no HTTP overhead</td>
+            <td><span class="badge badge-amber">Slower</span> — each command is an HTTP round-trip</td>
+          </tr>
+          <tr>
+            <td><strong>Auto-waiting</strong></td>
+            <td><span class="badge badge-teal">Built-in</span> — actionability checks before every action</td>
+            <td><span class="badge badge-red">Manual</span> — you write explicit waits or use FluentWait</td>
+          </tr>
+          <tr>
+            <td><strong>Browser Support</strong></td>
+            <td>Chromium, Firefox, WebKit (Safari engine)</td>
+            <td>Chrome, Firefox, Edge, Safari, IE (via drivers)</td>
+          </tr>
+          <tr>
+            <td><strong>Test Isolation</strong></td>
+            <td><span class="badge badge-teal">Browser Contexts</span> — isolated per test, no restart needed</td>
+            <td>Manual — restart driver or manage cookies manually</td>
+          </tr>
+          <tr>
+            <td><strong>Parallel Execution</strong></td>
+            <td><span class="badge badge-teal">Native</span> — built into the test runner</td>
+            <td>Needs Selenium Grid or TestNG configuration</td>
+          </tr>
+          <tr>
+            <td><strong>API Testing</strong></td>
+            <td><span class="badge badge-teal">Built-in</span> — <code style="font-family:'JetBrains Mono',monospace">request</code> fixture included</td>
+            <td><span class="badge badge-red">Not included</span> — need RestAssured or separate library</td>
+          </tr>
+          <tr>
+            <td><strong>Debugging Tools</strong></td>
+            <td>Trace Viewer, Playwright Inspector, UI Mode, Video</td>
+            <td>Screenshots via listeners; third-party reporting</td>
+          </tr>
+          <tr>
+            <td><strong>Network Interception</strong></td>
+            <td><span class="badge badge-teal">Native</span> — <code style="font-family:'JetBrains Mono',monospace">page.route()</code> built in</td>
+            <td><span class="badge badge-red">Not native</span> — needs BrowserMob Proxy or WireMock</td>
+          </tr>
+          <tr>
+            <td><strong>Community & Ecosystem</strong></td>
+            <td>Growing fast — strong Microsoft backing</td>
+            <td><span class="badge badge-teal">Mature</span> — 15+ years, huge community and resources</td>
+          </tr>
+          <tr>
+            <td><strong>Language Support</strong></td>
+            <td>JS/TS, Python, Java, .NET</td>
+            <td>JS, Python, Java, C#, Ruby, Kotlin</td>
+          </tr>
+          <tr>
+            <td><strong>Mobile Testing</strong></td>
+            <td>Emulation only (viewport simulation)</td>
+            <td>Real device testing via Appium integration</td>
+          </tr>
+          <tr>
+            <td><strong>Cloud Execution</strong></td>
+            <td>BrowserStack, LambdaTest, Sauce Labs</td>
+            <td>Selenium Grid, all major cloud providers</td>
+          </tr>
+          <tr>
+            <td><strong>When to Choose</strong></td>
+            <td>Modern web apps, CI/CD-first teams, new projects</td>
+            <td>Legacy projects, mobile needs, large existing codebase</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pull-quote">
+      <p>"Selenium taught us how to automate. Playwright showed us how to automate without fighting the browser."</p>
+    </div>
+  </div>
+</section>
+
+<!-- KEY TAKEAWAYS -->
+<section>
+  <div class="wrapper">
+    <div class="section-label">// 07 — Summary</div>
+    <h2>Key Takeaways for QA Engineers</h2>
+
+    <div class="takeaways">
+      <div class="takeaway">
+        <div class="takeaway-icon">🏗️</div>
+        <h4>Architecture matters</h4>
+        <p>WebSocket + protocol-level communication is why Playwright is fast and reliable — not magic.</p>
+      </div>
+      <div class="takeaway">
+        <div class="takeaway-icon">🔒</div>
+        <h4>Context = Isolation</h4>
+        <p>Browser contexts give you fresh sessions per test without restarting the browser. Use them for parallel tests.</p>
+      </div>
+      <div class="takeaway">
+        <div class="takeaway-icon">⏳</div>
+        <h4>Stop writing explicit waits</h4>
+        <p>Playwright's auto-waiting handles 90% of timing issues. Let the framework do the work.</p>
+      </div>
+      <div class="takeaway">
+        <div class="takeaway-icon">🔗</div>
+        <h4>UI + API in one test</h4>
+        <p>Use the built-in <code style="font-family:'JetBrains Mono',monospace;color:var(--teal)">request</code> fixture to set up data via API, then verify via UI.</p>
+      </div>
+      <div class="takeaway">
+        <div class="takeaway-icon">🎭</div>
+        <h4>Trace Viewer is your best friend</h4>
+        <p>When tests fail in CI, use traces to replay exactly what happened — screenshot by screenshot.</p>
+      </div>
+      <div class="takeaway">
+        <div class="takeaway-icon">🚀</div>
+        <h4>It's not replacing Selenium yet</h4>
+        <p>For new projects and modern apps, Playwright is the clear choice. For large Selenium codebases, migrate gradually.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section>
+  <div class="wrapper">
+    <div class="section-label">// One Line to Remember</div>
+    <div class="pull-quote" style="margin-top:20px">
+      <p>"Understanding your tool's architecture is what separates a test writer from a test engineer."</p>
+    </div>
+ </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="divider"></div>
+  <div class="footer-author">Greeshma</div>
+  <div class="footer-role">QA Engineer · 7+ Years Experience · Playwright Automation Learner</div>
+  
+ </div>
+
+</body>
+</html>
