@@ -10,10 +10,6 @@ test("Verify the appoinment booking opened",async ({page}) =>{
          await btn.click();
          await page.waitForTimeout(3000);
 
-         //const value = await page.locator("#firstName").inputValue();
-
-//await page.locator("#lastName").fill(value);//
-         //ThisIsNotAPassword
         const User = await page.locator('input[placeholder="Username"][readonly]').inputValue();
          let username=page.locator("#txt-username");
          await username.fill(User);
