@@ -1,0 +1,17 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: 05_Allure_Reporting\235_Media_Custom_Report.spec.ts >> dashboard loads with media captured — Test1
+- Location: tests\05_Allure_Reporting\235_Media_Custom_Report.spec.ts:22:9
+
+# Error details
+
+```
+Error: Error reading storage state from ./user-session.json:
+ENOENT: no such file or directory, open 'D:\PlaywrightFundamental\user-session.json'
+```

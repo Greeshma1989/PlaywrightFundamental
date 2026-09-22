@@ -1,0 +1,300 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: 05_Allure_Reporting\235_Media_Custom_Report.spec.ts >> dashboard loads with media captured — Test3
+- Location: tests\05_Allure_Reporting\235_Media_Custom_Report.spec.ts:22:9
+
+# Error details
+
+```
+Test timeout of 30000ms exceeded.
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic:
+      - navigation:
+        - navigation "Main navigation" [ref=e3]:
+          - list [ref=e4]:
+            - listitem [ref=e5]:
+              - button "Go to Wingz Interface" [ref=e6] [cursor=pointer]:
+                - generic [ref=e10]: Wingz
+              - generic [ref=e15] [cursor=pointer]: Chat
+              - generic [ref=e16] [cursor=pointer]: Agents
+              - generic [ref=e17] [cursor=pointer]: Workflows
+              - generic [ref=e18] [cursor=pointer]: Synthetic A/B
+            - listitem [ref=e19]:
+              - link "Go to Dashboard" [ref=e20] [cursor=pointer]:
+                - /url: "#/dashboard"
+                - generic [ref=e23]: Dashboard
+            - listitem [ref=e24]:
+              - button "Experimentation menu" [ref=e25] [cursor=pointer]:
+                - generic [ref=e28]: Experimentation
+              - generic [ref=e31] [cursor=pointer]: Web Experimentation
+              - generic [ref=e32] [cursor=pointer]: Web Rollout
+            - listitem [ref=e33]:
+              - link "Go to Journey Analytics" [ref=e34] [cursor=pointer]:
+                - /url: "#/analytics?view=overview"
+                - generic [ref=e37]: Journey Analytics
+            - listitem [ref=e38]:
+              - button "Behavior Analytics menu" [ref=e39] [cursor=pointer]:
+                - generic [ref=e42]: Behavior Analytics
+              - generic [ref=e45] [cursor=pointer]: Dashboard
+              - generic [ref=e46] [cursor=pointer]: Heatmaps
+              - generic [ref=e47] [cursor=pointer]: Session Recordings
+              - generic [ref=e48] [cursor=pointer]: Mobile Recordings
+              - generic [ref=e49] [cursor=pointer]: Forms
+            - listitem [ref=e50]:
+              - button "User feedback menu" [ref=e51] [cursor=pointer]:
+                - generic [ref=e54]: User feedback
+              - generic [ref=e57] [cursor=pointer]: Surveys
+              - generic [ref=e58] [cursor=pointer]: Concept Test
+              - generic [ref=e59] [cursor=pointer]: Templates
+              - generic [ref=e60] [cursor=pointer]: Settings
+            - listitem [ref=e61]:
+              - button "Feature Management" [ref=e62] [cursor=pointer]
+              - generic [ref=e68] [cursor=pointer]: Feature Flags
+              - generic [ref=e69] [cursor=pointer]: Feature Rollout
+              - generic [ref=e70] [cursor=pointer]: Feature Experimentation
+              - generic [ref=e71] [cursor=pointer]: Feature Multivariate
+              - generic [ref=e72] [cursor=pointer]: Feature Personalization
+              - generic: Tech Debt
+            - listitem [ref=e73]:
+              - link "Go to Web Personalization" [ref=e74] [cursor=pointer]:
+                - /url: "#/target/targeting/"
+                - generic [ref=e77]: Web Personalization
+            - listitem [ref=e78]:
+              - button "Data Platform menu" [ref=e79] [cursor=pointer]:
+                - generic [ref=e82]: Data Platform
+              - generic [ref=e85] [cursor=pointer]: Introduction
+              - generic [ref=e86] [cursor=pointer]: Profiles
+              - generic [ref=e87] [cursor=pointer]: Attributes
+              - generic [ref=e88] [cursor=pointer]: Events
+              - generic [ref=e89] [cursor=pointer]: Segments
+              - generic [ref=e90] [cursor=pointer]: Triggers
+              - generic [ref=e91] [cursor=pointer]: Audiences
+              - generic [ref=e92] [cursor=pointer]: Metrics
+              - generic [ref=e93] [cursor=pointer]: Funnels
+              - generic [ref=e94] [cursor=pointer]: Audit
+            - listitem [ref=e95]:
+              - button "Plan menu" [ref=e96] [cursor=pointer]:
+                - generic [ref=e100]: Plan
+              - generic [ref=e103] [cursor=pointer]: Observations
+              - generic [ref=e104] [cursor=pointer]: Hypotheses
+              - generic [ref=e105] [cursor=pointer]: Ideas
+            - listitem
+            - listitem [ref=e106]:
+              - link "Go to Upgrade" [ref=e107] [cursor=pointer]:
+                - /url: "#/settings/upgrade/testing"
+                - generic [ref=e110]: View Plan
+              - button "Configurations menu" [ref=e111] [cursor=pointer]:
+                - generic [ref=e114]: Configurations
+              - generic [ref=e117] [cursor=pointer]: Websites and Apps
+              - generic [ref=e118] [cursor=pointer]: Integrations
+              - generic [ref=e119] [cursor=pointer]: Elements
+              - generic [ref=e120] [cursor=pointer]: Pages
+              - generic [ref=e121] [cursor=pointer]: Asset Hub
+            - listitem [ref=e122]:
+              - link "Go to Settings" [ref=e123] [cursor=pointer]:
+                - /url: "#/settings/accounts/general"
+                - generic [ref=e126]: Settings
+            - listitem [ref=e127]:
+              - link "View Product Updates (opens in new tab)" [ref=e128] [cursor=pointer]:
+                - /url: http://wingify.com/product-updates
+                - generic [ref=e131]: Updates
+              - button "Toggle navigation menu" [ref=e136] [cursor=pointer]
+    - banner [ref=e139]:
+      - link "Go to dashboard" [ref=e141] [cursor=pointer]:
+        - /url: "#/dashboard"
+        - img "Wingify ABTasty logo" [ref=e142]
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - generic [ref=e146]:
+            - button "30 days remaining" [ref=e147] [cursor=pointer]
+            - button "Upgrade" [ref=e149] [cursor=pointer]
+          - generic [ref=e150]:
+            - heading "Eldver" [level=6] [ref=e151]
+            - generic [ref=e152]:
+              - generic [ref=e153]: "#1281574"
+              - button "Copy to clipboard" [ref=e154] [cursor=pointer]
+          - button "Need Help?" [ref=e161] [cursor=pointer]
+          - button "View Account Usage Activity" [ref=e170] [cursor=pointer]
+          - generic "Notifications" [ref=e175]:
+            - dialog "Notification dialog" [ref=e176]:
+              - button "Open notifications" [ref=e177] [cursor=pointer]
+        - button "Wingz" [ref=e183] [cursor=pointer]
+        - button "Open user menu" [ref=e188] [cursor=pointer]:
+          - img "sacha eldver" [ref=e189]
+    - main "Application main content" [ref=e190]:
+      - generic [ref=e196]:
+        - list [ref=e198]:
+          - listitem [ref=e199] [cursor=pointer]:
+            - button "View dashboard" [ref=e201]: Dashboard
+          - listitem [ref=e202] [cursor=pointer]:
+            - button "Get started with Wingify" [ref=e203]: Get Started
+          - listitem [ref=e204] [cursor=pointer]:
+            - button "View campaigns overview" [ref=e206]: Campaigns Overview
+          - listitem [ref=e207] [cursor=pointer]:
+            - button "View Impact Dashboard" [ref=e209]: Impact Dashboard
+        - generic [ref=e211]:
+          - generic [ref=e212]:
+            - heading "Dashboard" [level=4] [ref=e217]
+            - list [ref=e219]:
+              - listitem [ref=e220]:
+                - img "Notification banner image" [ref=e221]
+                - generic [ref=e222]:
+                  - heading "Wingify Chrome Extension" [level=6] [ref=e223]
+                  - paragraph [ref=e224]: For enhanced capabilities in Wingify
+                - generic "Install" [ref=e226] [cursor=pointer]
+          - generic [ref=e228]:
+            - generic [ref=e238]:
+              - heading "Meet Wingz" [level=3] [ref=e239]
+              - paragraph [ref=e243]: Ask about campaigns, recordings, heatmaps, and test ideas. All in one conversation.
+              - generic [ref=e248]:
+                - generic [ref=e249]: "[⇥ Tab] Analyze t"
+                - generic [ref=e252]:
+                  - button "Add files, agents and more" [ref=e258] [cursor=pointer]
+                  - generic [ref=e261]:
+                    - button "Thinking" [ref=e266] [cursor=pointer]
+                    - button "Record" [ref=e272] [cursor=pointer]
+                    - button "Send message" [disabled]
+              - generic [ref=e280]:
+                - button "Analyze data" [ref=e281] [cursor=pointer]
+                - button "Identify friction" [ref=e285] [cursor=pointer]
+                - button "Get ideas" [ref=e289] [cursor=pointer]
+                - button "Explore" [ref=e293] [cursor=pointer]
+            - generic [ref=e297]:
+              - generic [ref=e298]:
+                - generic [ref=e301]:
+                  - heading "Campaigns status" [level=5] [ref=e303]
+                  - generic [ref=e310]:
+                    - heading "No campaigns" [level=6] [ref=e311]
+                    - paragraph [ref=e312]: Create your first campaign to track its status and progress.
+                    - button "Create campaign" [ref=e313] [cursor=pointer]
+                - generic [ref=e316]:
+                  - heading "Campaign velocity" [level=5] [ref=e318]
+                  - generic [ref=e325]:
+                    - heading "No campaigns started" [level=6] [ref=e326]
+                    - paragraph [ref=e327]: Create & start your first campaign.
+                    - button "Create campaign" [ref=e328] [cursor=pointer]
+                - generic [ref=e331]:
+                  - heading "Scheduled campaigns" [level=5] [ref=e334]
+                  - generic [ref=e341]:
+                    - heading "No scheduled campaigns" [level=6] [ref=e342]
+                    - paragraph [ref=e343]: Scheduled campaigns will appear here once they are set up.
+              - generic [ref=e344]:
+                - generic [ref=e346]:
+                  - heading "Active tests" [level=5] [ref=e348]
+                  - generic [ref=e351]:
+                    - img "Active test empty" [ref=e352]
+                    - heading "No active tests" [level=5] [ref=e353]
+                    - paragraph [ref=e354]: Set up your first experimentation campaign to validate a hypothesis and increase conversion rates.
+                    - link "Create a new test" [ref=e356] [cursor=pointer]:
+                      - /url: "#/test/create/web/ab"
+                      - text: Create Test
+                - generic [ref=e359]:
+                  - heading "Untested hypotheses" [level=5] [ref=e361]
+                  - generic [ref=e365]:
+                    - img "Hypothesis empty" [ref=e366]
+                    - heading "No hypothesis created" [level=5] [ref=e367]
+                    - paragraph [ref=e368]: Start building your hypotheses backlog.
+                    - link "Create new hypothesis" [ref=e369] [cursor=pointer]:
+                      - /url: "#/plan/hypotheses/listview"
+                      - text: Create Hypothesis
+              - generic [ref=e371]:
+                - generic [ref=e373]:
+                  - heading "Rolled out experiences" [level=5] [ref=e375]
+                  - generic [ref=e377]:
+                    - generic [ref=e381]:
+                      - heading "No active experiences" [level=5] [ref=e382]
+                      - paragraph [ref=e383]: Set up your first experience.
+                      - link "Create new experience" [ref=e385] [cursor=pointer]:
+                        - /url: "#/deploy/create/web/experience"
+                        - text: Create Experience
+                    - list [ref=e386]:
+                      - listitem [ref=e387]
+                      - listitem [ref=e390]
+                      - listitem [ref=e393]
+                - generic [ref=e397]:
+                  - heading "Total experiences" [level=5] [ref=e399]
+                  - link "View all experiences" [ref=e401] [cursor=pointer]:
+                    - /url: "#/deploy/experience"
+                    - generic [ref=e402]: "0"
+      - generic [ref=e407]:
+        - list [ref=e409]:
+          - listitem [ref=e410] [cursor=pointer]:
+            - button "Get Support" [ref=e411]
+          - listitem [ref=e415] [cursor=pointer]:
+            - link "Developer resources" [ref=e416]:
+              - /url: "#/developers"
+          - listitem [ref=e420] [cursor=pointer]:
+            - link "Give us a call" [ref=e421]:
+              - /url: tel:+14153493207
+              - generic [ref=e424]: +1-415-349-3207
+        - list [ref=e426]:
+          - listitem [ref=e427] [cursor=pointer]:
+            - button "Show logged in users" [ref=e428]
+          - listitem [ref=e432] [cursor=pointer]:
+            - generic [ref=e433]: "Data Region: APAC"
+          - listitem [ref=e437] [cursor=pointer]:
+            - link "Uptime Status" [ref=e438]:
+              - /url: https://secure-stats.pingdom.com/yd4ybaf8hhh2
+        - link "Visit wingify.com" [ref=e444] [cursor=pointer]:
+          - /url: https://wingify.com
+          - img "Wingify logo" [ref=e445]
+  - img [ref=e446]:
+    - generic: "'"
+  - textbox [aria-hidden] [ref=e464]
+  - dialog "modal-header-2" [ref=e465]:
+    - generic [ref=e466] [cursor=pointer]
+    - generic [ref=e467]:
+      - button "Close" [ref=e469] [cursor=pointer]
+      - generic [ref=e473]:
+        - iframe [ref=e476]:
+          - generic [ref=f5e1]:
+            - generic "YouTube Video Player" [ref=f5e3]
+            - generic [ref=f5e5]:
+              - generic:
+                - generic:
+                  - generic [ref=f5e6] [cursor=pointer]
+                  - button "Play video" [ref=f5e10] [cursor=pointer]
+                  - button "Hide player controls" [ref=f5e14] [cursor=pointer]
+                  - generic [ref=f5e16]:
+                    - generic [ref=f5e21]:
+                      - generic [ref=f5e22]:
+                        - link "Wandz - AI-Powered Conversion Optimization, Simplified" [ref=f5e23] [cursor=pointer]:
+                          - /url: https://www.youtube.com/watch?v=tqkiieU5-D0
+                        - link "VWO (Now Wingify)" [ref=f5e24] [cursor=pointer]:
+                          - /url: /channel/UCrBjthzISHek6viOh-YYJ7g
+                      - generic [ref=f5e26]:
+                        - button [ref=f5e27] [cursor=pointer]:
+                          - img "thumbnail-image" [ref=f5e28]
+                        - generic [ref=f5e30]:
+                          - generic: VWO (Now Wingify)
+                          - generic: 7.83K subscribers
+                    - generic [ref=f5e31]:
+                      - button "Share" [ref=f5e34] [cursor=pointer]
+                      - link "Watch on YouTube" [ref=f5e45] [cursor=pointer]:
+                        - /url: https://www.youtube.com/watch?v=tqkiieU5-D0
+                        - generic [ref=f5e46]: Watch on
+        - generic [ref=e477]:
+          - paragraph [ref=e478]: Meet
+          - heading "Wingz" [level=2] [ref=e482]
+          - paragraph [ref=e483]: Discover how the unified power of Wingify and AB Tasty leverages AI to streamline your conversion rate optimization. From generating experiment ideas to launching flawless rollouts, see how end-to-end optimization just got smarter.
+          - generic [ref=e489]:
+            - heading "Welcome to Wingz Early Access" [level=5] [ref=e490]
+            - generic [ref=e492]:
+              - paragraph [ref=e493]: We've activated a 1-month Wingz Advanced trial for your workspace so you can generate ideas, analyze behavior, and create experiments with AI.
+              - generic [ref=e494]: 1 month free
+          - generic [ref=e498]:
+            - button "Start using Wingz" [ref=e499] [cursor=pointer]
+            - paragraph [ref=e506]: Your access is active. No additional setup needed.
+```
