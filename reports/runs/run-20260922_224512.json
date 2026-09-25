@@ -1,8 +1,0 @@
-{
-  "runId": "20260922_224512",
-  "tests": {
-    "chromium › 05_Allure_Reporting\\235_Media_Custom_Report.spec.ts › dashboard loads with media captured — Test2": "timedOut",
-    "chromium › 05_Allure_Reporting\\235_Media_Custom_Report.spec.ts › dashboard loads with media captured — Test1": "timedOut",
-    "chromium › 05_Allure_Reporting\\235_Media_Custom_Report.spec.ts › dashboard loads with media captured — Test3": "timedOut"
-  }
-}
