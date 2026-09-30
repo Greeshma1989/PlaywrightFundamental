@@ -1,0 +1,1 @@
+getByRole('radio', { name: 'Automation Tester' })

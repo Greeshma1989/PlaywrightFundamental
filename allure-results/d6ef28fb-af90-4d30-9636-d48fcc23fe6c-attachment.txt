@@ -1,0 +1,2 @@
+getByRole('radio', { name: 'Automation Tester' })
+getByRole('link', { name: /Download file/ })
