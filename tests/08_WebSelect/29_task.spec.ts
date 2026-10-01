@@ -5,13 +5,14 @@ test('Verify QA Profile form', async ({ page }) => {
     await page.goto('https://app.thetestingacademy.com/playwright/tables/practice#page');
     
 //Fill the First name and Last name text inputs using
-// assert the values came back via expect(input).toHaveValue('...').
+
     await page.locator("#first-name").fill("Greeshma");
     await page.getByLabel("Last name").fill("P");
-
-    const female=await page.getByRole('radio',{name:'Female'});
+        const female=await page.getByRole('radio',{name:'Female'});
     await female.check();
     await expect(female).toBeChecked();
+
+
     const syr = page.locator("#years-experience");
     await syr.selectOption("7");
     await expect(syr).toHaveValue("7");
