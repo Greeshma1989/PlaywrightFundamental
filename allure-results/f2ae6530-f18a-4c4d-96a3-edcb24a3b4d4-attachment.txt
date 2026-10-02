@@ -1,5 +1,0 @@
-① Single — searchable
-② Multi — chips with remove
-③ Creatable multi — type and Enter
-④ Grouped — categorised options
-⑤ Async — fetched on type
