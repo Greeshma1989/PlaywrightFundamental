@@ -1,5 +1,10 @@
 import { test, expect, Locator } from '@playwright/test';
 import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const useremail = process.env.APP_email;
 
 
 const URL = 'https://app.thetestingacademy.com/login'; // replace with target page
@@ -15,7 +20,7 @@ test.describe('APP profile pic Testcases', () => {
         //const card=page.locator('plasmo-shadow-container');
 
 
-        await page.getByRole('textbox', { name: 'Email address' }).fill('p.greeshma23@gmail.com');
+        await page.getByRole('textbox', { name: 'Email address' }).fill(useremail!);
         await page.getByRole('button', { name: 'Continue', exact: true }).click();
         await page.getByRole('textbox', { name: 'Enter verification code' }).fill('531928');
         await page.getByRole('button', { name: 'Account' }).click();
